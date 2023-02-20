@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  ports:
+    - port: 5432
+      name: postgres
+      nodePort : 30005
+  type : NodePort
+  selector:
+    app: postgres
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbscripts
+data:
+  01_init_db.sql: |-
+    CREATE TABLE IF NOT EXISTS Players
+    (
+        Id serial PRIMARY KEY,
+        Username  VARCHAR (15)  NOT NULL,
+        Password  VARCHAR (15)  NOT NULL,
+        Email  VARCHAR (40)  NOT NULL,
+        Credit SMALLINT DEFAULT 0 NOT NULL,
+        Score DOUBLE PRECISION NULL
+    );
+    INSERT INTO Players (Username,Password, Email, Credit, Score)
+    SELECT 'ysfrdvn' AS Username, '1995' AS Password, 'alex@gmail.com' AS Email, 3 as Credit, 0 as score
+    WHERE Not EXISTS(
+                SELECT Username FROM Players WHERE Username= 'ysfrdvn'
+        )
+    LIMIT 1;
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: my_user
+        - name: POSTGRES_PASSWORD
+          value: pass1234
+        - name: POSTGRES_DB
+          value: matchbet_db
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: dbscripts
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data
+      - name: dbscripts
+        configMap:
+          name: dbscripts
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  labels:
+    app: pgadmin
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: pgadmin
+      nodePort: 30000
+      protocol: TCP
+  selector:
+    app: pgadmin
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: "pgadmin4@pgadmin.org"
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: "admin"

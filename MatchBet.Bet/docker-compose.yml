@@ -1,0 +1,35 @@
+version: '3.4'
+
+networks:
+  global:
+    driver: bridge
+
+services:
+  my_mongo:
+    container_name: my_mongo
+    image: mongo
+    restart: on-failure
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+    networks:
+      - global
+
+  matchbet.betsapi:
+    image: ${DOCKER_REGISTRY-}matchbetbetsapi
+    container_name: matchbet_betsapi
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - "my_mongo"
+    networks:
+      - global
+    environment:
+      - MongoConnection__ConnectionString=mongodb://my_mongo:27017/
+      - MongoConnection__Database=MatchBet
+      - MatchApiKey=burayakeygelecek
+
+volumes:
+  mongodb:

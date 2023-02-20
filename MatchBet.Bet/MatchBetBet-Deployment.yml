@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bet-app-lb
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 2425 #Buradan etkileşim kurucaz.
+    targetPort: 5000
+  selector:
+    app: bet-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bet-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bet-app
+  template:
+    metadata:
+      labels:
+        app: bet-app
+    spec:
+      containers:
+      - name: bet-app
+        image: matchbet-bet
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MongoConnection__ConnectionString
+          value: "mongodb://mongo-svc:27017/"
+        - name: MongoConnection__Database
+          value: "MatchBet"
+        - name: MatchApiKey
+          value: "fafa894307msh153846cd1ae874ep129895jsna7cdd3f3e836"

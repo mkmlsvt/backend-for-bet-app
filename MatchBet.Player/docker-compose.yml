@@ -1,0 +1,57 @@
+version: '3.4'
+
+networks:
+  global:
+    driver: bridge
+
+services:
+  matchbet.player:
+    image: ${DOCKER_REGISTRY-}matchbetplayer
+    container_name: matchbetplayer_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - "postgres_image"
+    environment:
+      ConnectionString: "host=my_postgre;port=5432;database=matchbet_db;username=my_user;password=pass1234"
+    networks:
+      - global
+
+  postgres_image:
+    image: postgres:latest
+    container_name: my_postgre
+    ports:
+      - "5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+      - "./dbscripts:/docker-entrypoint-initdb.d"
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: pass1234
+      POSTGRES_DB: matchbet_db
+    networks:
+      - global
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - global
+    restart: unless-stopped
+
+volumes:
+  db_volume:
+  pgadmin:

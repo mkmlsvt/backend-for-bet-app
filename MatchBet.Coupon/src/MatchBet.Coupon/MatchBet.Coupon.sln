@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33027.239
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MatchBet.Coupon", "MatchBet.Coupon\MatchBet.Coupon.csproj", "{B0459CF3-1908-43FD-8382-1933BE373589}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0459CF3-1908-43FD-8382-1933BE373589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0459CF3-1908-43FD-8382-1933BE373589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0459CF3-1908-43FD-8382-1933BE373589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0459CF3-1908-43FD-8382-1933BE373589}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86D26CB7-50DA-4098-934C-811C4181396A}
+	EndGlobalSection
+EndGlobal
